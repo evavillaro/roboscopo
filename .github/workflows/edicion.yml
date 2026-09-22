@@ -1,0 +1,47 @@
+name: Edición de las 06:00
+
+on:
+  schedule:
+    # GitHub usa UTC. 04:00 UTC = 06:00 en verano; 05:00 UTC = 06:00 en invierno.
+    # El script comprueba la hora de Madrid y no repite la edición del día.
+    - cron: "0 4 * * *"
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerar aunque ya exista la edición de hoy"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: edicion
+  cancel-in-progress: false
+
+jobs:
+  edicion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Redactar la edición
+        run: node scripts/edicion.mjs
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ROBOSCOPO_MODEL: ${{ vars.ROBOSCOPO_MODEL }}
+          FORCE: ${{ inputs.force }}
+      - name: Publicar
+        run: |
+          git config user.name "Unidad R-42"
+          git config user.email "r42@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "Sin cambios."; else
+            git commit -m "Edición $(date -u +%F)"
+            git push
+          fi

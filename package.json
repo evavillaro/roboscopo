@@ -1,0 +1,21 @@
+{
+  "name": "roboscopo",
+  "version": "1.0.0",
+  "description": "Horóscopos contrastados con las portadas por un robot que no se cree ninguna de las dos cosas.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "edicion": "node scripts/edicion.mjs",
+    "edicion:forzar": "cross-env FORCE=1 node scripts/edicion.mjs",
+    "servir": "npx serve -l 8080 ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roboscopo</title>
+<meta name="description" content="Lo que dicen los astros, lo que dicen las portadas y lo poco que coincide. Escrito cada mañana a las 06:00 por un robot que no se cree ninguna de las dos cosas.">
+<meta property="og:title" content="Roboscopo">
+<meta property="og:description" content="Horóscopos contrastados con las portadas por un robot desganado. Actualizado cada mañana a las 06:00.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2317191C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23C8102E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  :root{
+    color-scheme:light dark;
+    --paper:#ECEDEA; --paper-2:#E1E3DF; --ink:#17191C; --ink-2:#4A4F57; --ink-3:#7C828B;
+    --rule:#C9CCC6; --robot:#2B2E33; --robot-text:#D8DBD6; --robot-dim:#8C919A;
+    --red:#C8102E; --red-ink:#FFFFFF; --amber:#9A6A00; --green:#1F6E48;
+    --mark:#F6E27A; --mark-ink:#17191C; --focus:#1F5FBF;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#16181B; --paper-2:#1F2226; --ink:#E4E3DE; --ink-2:#B4B7B1; --ink-3:#7E838B;
+      --rule:#33373D; --robot:#0E0F11; --robot-text:#CFD2CC; --robot-dim:#7F848D;
+      --red:#E3213F; --amber:#D9A21B; --green:#4CB37E; --mark:#7A6A12; --mark-ink:#FFF5C2; --focus:#6FA1FF;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding-block:0 64px;padding-inline:16px}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  mark{background:var(--mark);color:var(--mark-ink);padding:0 .15em;border-radius:2px}
+  [hidden]{display:none!important}
+
+  .masthead{border-bottom:3px solid var(--ink);padding-block:18px 10px}
+  .masthead .top{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);flex-wrap:wrap}
+  .masthead h1{font-family:var(--display);font-weight:900;font-size:clamp(64px,14vw,150px);line-height:.88;letter-spacing:.005em;margin:6px 0 4px;text-transform:uppercase}
+  .masthead h1 span{color:var(--red)}
+  .tagline{font-style:italic;font-size:clamp(16px,2.2vw,21px);color:var(--ink-2);margin:0;text-wrap:balance}
+  .datastrip{display:flex;flex-wrap:wrap;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);margin-top:12px;font-family:var(--mono);font-size:12px}
+  .datastrip div{padding:8px 14px 8px 0;margin-right:14px;border-right:1px solid var(--rule)}
+  .datastrip div:last-child{border-right:0}
+  .datastrip b{font-weight:600;color:var(--ink)}
+  .datastrip span{color:var(--ink-3)}
+
+  .robot{background:var(--robot);color:var(--robot-text);font-family:var(--mono);font-size:14.5px;line-height:1.65;padding:22px 24px;border-radius:4px;margin-top:28px}
+  .robot .who{display:flex;gap:10px;align-items:center;color:var(--robot-dim);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+  .robot .who i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.25)}
+  .robot p{margin:0 0 12px}
+  .robot p:last-child{margin-bottom:0}
+  .robot mark{background:transparent;color:#fff;font-weight:600;padding:0}
+
+  section{margin-top:44px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:18px;flex-wrap:wrap}
+  .sec-head h2{font-family:var(--display);font-weight:900;font-size:clamp(30px,5vw,48px);text-transform:uppercase;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+  .sec-head .note{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+
+  .ranking{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+  @media (max-width:760px){.ranking{grid-template-columns:1fr}}
+  .rank-col h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 6px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+  .rank-col h3 .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .rank-col.best h3 .dot{background:var(--green)}
+  .rank-col.worst h3 .dot{background:var(--red)}
+  .rank{list-style:none;margin:0;padding:0}
+  .rank li{display:grid;grid-template-columns:34px 1fr 64px;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--rule)}
+  .rank li:first-child{border-top:0}
+  .rank .pos{font-family:var(--display);font-weight:900;font-size:30px;line-height:1;color:var(--ink-3);padding-top:2px}
+  .rank .name{font-family:var(--display);font-weight:700;font-size:24px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+  .rank .name small{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;text-transform:none;margin-left:8px}
+  .rank .why{font-size:15px;color:var(--ink-2);margin-top:4px;line-height:1.4}
+  .rank .score{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink-2)}
+  .rank .score b{display:block;font-family:var(--display);font-weight:900;font-size:26px;line-height:1;color:var(--ink)}
+  .bar{height:5px;background:var(--paper-2);border-radius:3px;margin-top:6px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--ink)}
+  .rank-col.best .bar i{background:var(--green)}
+  .rank-col.worst .bar i{background:var(--red)}
+  .rank-mid{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px}
+  .rank-mid summary{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+  .rank-mid ul{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px 24px;font-family:var(--mono);font-size:13px}
+  .rank-mid li{display:flex;justify-content:space-between;border-bottom:1px dotted var(--rule);padding:4px 0}
+  .rank-mid li span{color:var(--ink-3)}
+
+  .heads{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+  @media (max-width:760px){.heads{grid-template-columns:1fr}}
+  .src h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:18px 0 4px;color:var(--ink-2)}
+  .src ol{margin:0;padding:0;list-style:none;counter-reset:h}
+  .src li{counter-increment:h;padding:9px 0 9px 30px;border-top:1px solid var(--rule);position:relative;font-size:15.5px;line-height:1.35;transition:background .2s}
+  .src li::before{content:counter(h,decimal-leading-zero);position:absolute;left:0;top:11px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .src li.hit{background:var(--mark);color:var(--mark-ink);margin-inline:-8px;padding-inline:38px 8px;border-radius:3px}
+  .src li.hit::before{left:8px;color:var(--mark-ink)}
+  .src li a{text-decoration:none;font-weight:600}
+  .src li a:hover{text-decoration:underline}
+
+  .yours{background:var(--paper-2);border:1px solid var(--rule);padding:22px;border-radius:4px}
+  .yours .lead{font-family:var(--mono);font-size:14px;color:var(--ink-2);margin:0 0 16px;line-height:1.6}
+  form{display:grid;grid-template-columns:1.6fr 1fr 1fr auto;gap:12px;align-items:end}
+  @media (max-width:760px){form{grid-template-columns:1fr 1fr}form .full{grid-column:1/-1}form button{grid-column:1/-1}}
+  label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+  input,select{font:15px var(--mono);padding:11px 12px;border:1px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
+  button{font:600 14px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:13px 20px;background:var(--ink);color:var(--paper);border:0;border-radius:3px;cursor:pointer}
+  button:hover{background:var(--red);color:var(--red-ink)}
+  button[disabled]{opacity:.6;cursor:wait}
+  .linkbtn{background:none;border:0;padding:0;color:inherit;text-decoration:underline;font:inherit;letter-spacing:0;text-transform:none;cursor:pointer}
+  .linkbtn:hover{background:none;color:var(--red)}
+  .err{font-family:var(--mono);font-size:13px;color:var(--red);margin:10px 0 0}
+
+  .result{margin-top:28px}
+  .idcard{display:grid;grid-template-columns:auto 1fr;gap:6px 24px;align-items:baseline;border-top:3px solid var(--ink);border-bottom:1px solid var(--rule);padding:14px 0}
+  @media (max-width:560px){.idcard{grid-template-columns:1fr}.idcard .sign{grid-row:auto}}
+  .idcard .sign{font-family:var(--display);font-weight:900;font-size:clamp(46px,9vw,84px);line-height:.9;text-transform:uppercase;grid-row:span 2}
+  .idcard .meta{font-family:var(--mono);font-size:13px;color:var(--ink-2);line-height:1.6}
+  .idcard .meta b{color:var(--ink);font-weight:600}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px;margin-top:22px}
+  @media (max-width:760px){.cols{grid-template-columns:1fr}}
+  .col h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px;color:var(--ink-2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .astros{font-style:italic;font-size:21px;line-height:1.45;margin:0}
+  .astros::before{content:"“";color:var(--ink-3)} .astros::after{content:"”";color:var(--ink-3)}
+  .astros-src{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+  .contrast{font-family:var(--mono);font-size:14.5px;line-height:1.65;margin:0}
+  .verdict{display:flex;gap:18px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .stamp{font-family:var(--display);font-weight:900;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;border:4px double currentColor;transform:rotate(-3deg);display:inline-block}
+  .stamp.no{color:var(--red)} .stamp.part{color:var(--amber)} .stamp.yes{color:var(--green)}
+  .meter{flex:1;min-width:180px}
+  .meter .lab{font-family:var(--mono);font-size:12px;color:var(--ink-2);display:flex;justify-content:space-between}
+  .meter .bar{height:8px;margin-top:6px}
+  .gen-block{margin-top:28px;border-top:1px solid var(--rule);padding-top:18px}
+  .wx{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;margin-top:12px}
+  @media (max-width:560px){.wx{grid-template-columns:1fr}}
+  .wx .temp{font-family:var(--display);font-weight:900;font-size:64px;line-height:.9}
+  .wx .temp small{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:6px;font-weight:400}
+  .wx .data{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:8px}
+  .share{margin-top:22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+
+  footer{margin-top:56px;border-top:3px solid var(--ink);padding-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);line-height:1.7}
+  footer h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px;color:var(--ink-3)}
+  footer p{margin:0 0 12px;max-width:72ch}
+  .loading{font-family:var(--mono);font-size:14px;color:var(--ink-3);padding:40px 0}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div class="top">
+      <span id="edicion">Edición en preparación</span>
+      <span>Redactado por una máquina que preferiría no hacerlo</span>
+    </div>
+    <h1>Robos<span>copo</span></h1>
+    <p class="tagline">Lo que dicen los astros, lo que dicen las portadas y lo poco que coincide. Escrito cada mañana a las 06:00 por un robot que no se cree ninguna de las dos cosas.</p>
+    <div class="datastrip" id="strip"></div>
+  </header>
+
+  <div class="robot" id="editorial" aria-label="Editorial del robot"><div class="who"><i></i> Unidad R-42 · editorial de las 06:00</div><p class="loading">Cargando la edición de hoy. Podría tardar menos si me importara.</p></div>
+
+  <section id="ranking" hidden>
+    <div class="sec-head"><h2>Los mejores y los peores horóscopos de hoy</h2><span class="note">Índice de día: lo que prometen los astros × lo que traen las portadas</span></div>
+    <div class="ranking">
+      <div class="rank-col best"><h3><span class="dot"></span>Los tres mejores</h3><ol class="rank" id="best"></ol></div>
+      <div class="rank-col worst"><h3><span class="dot"></span>Los tres peores</h3><ol class="rank" id="worst"></ol></div>
+    </div>
+    <details class="rank-mid"><summary>Los seis del medio, que ni fu ni fa</summary><ul id="mid"></ul></details>
+  </section>
+
+  <section id="portadas" hidden>
+    <div class="sec-head"><h2>Las portadas que he tenido que leer</h2><span class="note" id="portadas-note">Se resaltan las que afectan a tu signo</span></div>
+    <div class="heads" id="heads"></div>
+  </section>
+
+  <section id="tuyo">
+    <div class="sec-head"><h2>El tuyo, si insistes</h2><span class="note">El mes da el signo. El año y la ciudad dan lo real.</span></div>
+    <div class="yours">
+      <p class="lead">Necesito tres datos. No los envío a ningún servidor: se quedan en tu navegador, que es más de lo que puedo decir de las portadas. La ciudad la busco en Open-Meteo para saber qué tiempo hace.</p>
+      <form id="f">
+        <label class="full">Ciudad<input id="ciudad" placeholder="Madrid, Sevilla, Bilbao, Buenos Aires…" autocomplete="address-level2" required></label>
+        <label>Mes de nacimiento<select id="mes" required></select></label>
+        <label>Año de nacimiento<input id="anio" type="number" min="1900" max="2030" placeholder="1989" required></label>
+        <button type="submit" id="go">Dime el mío</button>
+      </form>
+      <p class="err" id="err" hidden></p>
+    </div>
+    <div class="result" id="res" hidden></div>
+  </section>
+
+  <footer>
+    <h4>Fuentes de esta edición</h4>
+    <p id="fuentes"></p>
+    <h4>Método</h4>
+    <p>Cada mañana a las 06:00 leo las portadas por RSS y los horóscopos del día, resumo ambos, los contrasto y puntúo la coincidencia. Lo escribo una vez y no lo toco hasta el día siguiente. El tiempo lo consulto en directo para tu ciudad en <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>. La fase lunar la calculo yo, con matemáticas, que es más de lo que hacen ellos.</p>
+    <h4>Aviso</h4>
+    <p>Ninguna predicción de esta página tiene valor, salvo la del tiempo, que la ha hecho un modelo numérico y no un planeta. Los titulares son de sus periódicos y enlazan a ellos. Los horóscopos se resumen con mis palabras. <a href="https://github.com/evavillaro/roboscopo" target="_blank" rel="noopener">Código</a>.</p>
+  </footer>
+</div>
+
+<script>
+const NOMBRES = {aries:["Aries","21 mar – 19 abr"],tauro:["Tauro","20 abr – 20 may"],geminis:["Géminis","21 may – 20 jun"],cancer:["Cáncer","21 jun – 22 jul"],leo:["Leo","23 jul – 22 ago"],virgo:["Virgo","23 ago – 22 sep"],libra:["Libra","23 sep – 22 oct"],escorpio:["Escorpio","23 oct – 21 nov"],sagitario:["Sagitario","22 nov – 21 dic"],capricornio:["Capricornio","22 dic – 19 ene"],acuario:["Acuario","20 ene – 18 feb"],piscis:["Piscis","19 feb – 20 mar"]};
+const ORDEN = Object.keys(NOMBRES);
+const MESES = [["Enero","capricornio","acuario",20],["Febrero","acuario","piscis",19],["Marzo","piscis","aries",21],["Abril","aries","tauro",20],["Mayo","tauro","geminis",21],["Junio","geminis","cancer",21],["Julio","cancer","leo",23],["Agosto","leo","virgo",23],["Septiembre","virgo","libra",23],["Octubre","libra","escorpio",23],["Noviembre","escorpio","sagitario",22],["Diciembre","sagitario","capricornio",22]];
+const GRUPOS = [["joven","Joven",29],["maduro","Maduro",49],["remaduro","Remaduro",64],["veterano","Veterano",999]];
+const CIELO = {0:"despejado",1:"casi despejado",2:"algo de nubes",3:"nublado",45:"niebla",48:"niebla",51:"llovizna",53:"llovizna",55:"llovizna",61:"lluvia",63:"lluvia",65:"lluvia fuerte",71:"nieve",73:"nieve",75:"nieve",80:"chubascos",81:"chubascos",82:"chubascos fuertes",95:"tormenta",96:"tormenta",99:"tormenta"};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+// El robot solo puede usar <mark>; cualquier otra etiqueta se neutraliza.
+const safe = s => esc(s).replace(/&lt;mark&gt;/g,"<mark>").replace(/&lt;\/mark&gt;/g,"</mark>");
+function fase(d){ const ref = Date.UTC(2000,0,6,18,14); const age = ((d - ref)/864e5) % 29.530588853; const ilum = Math.round((1 - Math.cos(2*Math.PI*age/29.530588853))/2*100);
+  const n = age<1.85?"nueva":age<7.4?"creciente":age<9.2?"cuarto creciente":age<14.8?"creciente":age<16.6?"llena":age<22.1?"menguante":age<23.9?"cuarto menguante":"menguante"; return `${n}, ${ilum} %`; }
+
+let ED = null, ranked = [], alt = false;
+
+async function cargar(){
+  try{
+    const r = await fetch("data/hoy.json", {cache:"no-cache"}); if(!r.ok) throw new Error(r.status);
+    ED = await r.json();
+  }catch(e){
+    $("#editorial").innerHTML = `<div class="who"><i></i> Unidad R-42</div><p>No encuentro la edición de hoy. O no se ha generado todavía, o alguien ha tocado algo. Vuelve más tarde. O no. Yo seguiré aquí.</p>`;
+    return;
+  }
+  const fechaEd = new Date(ED.fecha + "T06:00:00");
+  $("#edicion").textContent = `Edición nº ${ED.numero} · ${ED.fecha_legible} · cerrada a las ${ED.cerrada}`;
+  document.title = `Roboscopo · ${ED.fecha_legible}`;
+  $("#strip").innerHTML = [
+    ["Horóscopos leídos", ED.horoscopos_reconstruidos ? "0, reconstruidos" : "12"],
+    ["Titulares leídos", ED.titulares.length],
+    ["Coincidencia media", ED.media_coin + " %"],
+    ["Atribuible al azar", ED.media_coin + " %"],
+    ["Luna", fase(fechaEd)],
+  ].map(([k,v])=>`<div><span>${k}</span> <b>${esc(v)}</b></div>`).join("");
+  $("#editorial").innerHTML = `<div class="who"><i></i> Unidad R-42 · editorial de las 06:00</div>` + ED.editorial.map(p=>`<p>${safe(p)}</p>`).join("") + (ED.sol ? `<p>${safe(ED.sol)}</p>` : "");
+
+  ranked = ORDEN.map(k=>({k, n:NOMBRES[k][0], f:NOMBRES[k][1], ...ED.signos[k]})).sort((a,b)=>b.score-a.score);
+  const item = (s,pos)=>`<li><span class="pos">${pos}</span><div><div class="name">${s.n}<small>${s.f}</small></div><div class="why">${esc(s.why)}</div><div class="bar"><i style="width:${Math.max(0,Math.min(10,s.score))*10}%"></i></div></div><div class="score"><b>${Number(s.score).toFixed(1)}</b>coinc. ${s.coin} %</div></li>`;
+  $("#best").innerHTML = ranked.slice(0,3).map((s,i)=>item(s,i+1)).join("");
+  $("#worst").innerHTML = ranked.slice(9).map((s,i)=>item(s,i+10)).join("");
+  $("#mid").innerHTML = ranked.slice(3,9).map((s,i)=>`<li><span>${i+4}</span> ${s.n} <span>${Number(s.score).toFixed(1)} · ${s.coin} %</span></li>`).join("");
+  $("#ranking").hidden = false;
+
+  const fuentes = [...new Set(ED.titulares.map(t=>t.src))];
+  $("#heads").innerHTML = fuentes.map(src=>`<div class="src"><h3>${esc(src)}</h3><ol>${ED.titulares.filter(t=>t.src===src).map(t=>`<li id="t${t.id}"><a href="${esc(t.u)}" target="_blank" rel="noopener">${esc(t.t)}</a></li>`).join("")}</ol></div>`).join("");
+  $("#portadas-note").textContent = `RSS de portada, ${ED.fecha} · se resaltan las que afectan a tu signo`;
+  $("#portadas").hidden = false;
+
+  $("#fuentes").innerHTML = `Titulares: ${esc(ED.fuentes_portadas.join(", "))}, leídos el ${esc(ED.fecha)} a las ${esc(ED.cerrada)}. Horóscopos: ${ED.horoscopos_reconstruidos ? "ninguna fuente accesible hoy; los he reconstruido aplicando su método, que consiste en no tener ninguno" : esc(ED.fuentes_horoscopo.join(", ")) + ", resumidos con mis palabras"}. Redacción: ${esc(ED.modelo)}, una sola llamada al día.`;
+
+  try{ const s = JSON.parse(localStorage.getItem("roboscopo")||"null"); if(s){ $("#ciudad").value=s.c||""; $("#mes").value=s.m??""; $("#anio").value=s.a||""; if(s.c && s.m!=="" && s.a) mostrar(false); } }catch(e){}
+}
+
+$("#mes").innerHTML = `<option value="">—</option>` + MESES.map((m,i)=>`<option value="${i}">${m[0]}</option>`).join("");
+$("#f").addEventListener("submit", e=>{ e.preventDefault(); alt=false; mostrar(true); });
+
+async function geocodificar(q){
+  const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=es&format=json`);
+  const j = await r.json(); if(!j.results?.length) return null;
+  return j.results.find(x=>x.country_code==="ES") || j.results[0];
+}
+async function prevision(g){
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${g.latitude}&longitude=${g.longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code,wind_speed_10m_max,uv_index_max&timezone=auto&forecast_days=1`);
+  const d = (await r.json()).daily;
+  return { max:d.temperature_2m_max[0], min:d.temperature_2m_min[0], lluvia:d.precipitation_probability_max[0], code:d.weather_code[0], viento:d.wind_speed_10m_max[0], uv:d.uv_index_max[0] };
+}
+function textoTiempo(w, lugar, grupo){
+  const cond = (w.lluvia>=40 || w.code>=51) ? "lluvia" : w.max>=30 ? "calor" : w.max<15 ? "frio" : "templado";
+  let t = cond==="lluvia" ? `Probabilidad de lluvia del ${w.lluvia} % en ${lugar}, ${CIELO[w.code]||"cielo indefinido"}, máxima de ${w.max} grados. Los astros no lo han mencionado. Yo sí.`
+        : cond==="calor" ? `${w.max} grados de máxima en ${lugar}. Los astros no lo han mencionado. Yo sí: es la única predicción de esta página con un 100 % de fiabilidad y nadie me lo agradece.`
+        : cond==="frio" ? `${w.max} grados de máxima en ${lugar}, ${CIELO[w.code]||""}. Frío. No es una metáfora astral, es termodinámica.`
+        : `${w.max} grados de máxima en ${lugar}, ${CIELO[w.code]||"cielo indefinido"}. Agradable, dicen los humanos. No tengo receptores para comprobarlo.`;
+  if(w.viento>=25) t += ` Viento de ${w.viento} km/h: los astros dirían "aires de cambio". Son aires. Sin más.`;
+  if(cond!=="lluvia") t += w.lluvia>0 ? ` Lluvia: ${w.lluvia} %. Insuficiente para alegrarme.` : ` Lluvia: 0 %. Como mis expectativas.`;
+  if(w.uv>=6) t += ` Índice UV ${w.uv}: crema solar. Es el único consejo de esta página que deberías seguir.`;
+  return { cond, t: t + " " + (grupo[cond] || "") };
+}
+
+async function mostrar(scroll){
+  if(!ED) return;
+  const cRaw = $("#ciudad").value.trim(), m = $("#mes").value, a = parseInt($("#anio").value,10);
+  const err = $("#err"); err.hidden = true;
+  const anioEd = parseInt(ED.fecha.slice(0,4),10);
+  if(!cRaw || m==="" || !a || a<1900 || a>anioEd){ err.textContent="Necesito ciudad, mes y año. Sin ellos no puedo ni inventarme nada."; err.hidden=false; return; }
+  const btn = $("#go"); btn.disabled = true; btn.textContent = "Consultando…";
+  let geo=null, w=null;
+  try{ geo = await geocodificar(cRaw); if(geo) w = await prevision(geo); }catch(e){ console.warn(e); }
+  btn.disabled = false; btn.textContent = "Dime el mío";
+  if(!geo){ err.textContent = `No encuentro "${cRaw}" en el mapa. Prueba con el nombre completo o con otra ciudad cercana.`; err.hidden=false; return; }
+  try{ localStorage.setItem("roboscopo", JSON.stringify({c:cRaw,m,a})); }catch(e){}
+
+  const mes = MESES[m]; const k = alt ? mes[2] : mes[1]; const s = ED.signos[k]; const otro = NOMBRES[alt?mes[1]:mes[2]][0];
+  const edad = anioEd - a; const gk = GRUPOS.find(g=>edad<=g[2]); const grupo = ED.grupos[gk[0]];
+  const lugar = geo.name + (geo.admin1 && geo.admin1!==geo.name ? ", " + geo.admin1 : "") + (geo.country_code!=="ES" ? " (" + geo.country + ")" : "");
+  const cls = s.coin>=60?"yes":s.coin>=35?"part":"no"; const lab = s.coin>=60?"Coinciden":s.coin>=35?"Coinciden a medias":"No coinciden";
+  const pos = ranked.findIndex(r=>r.k===k)+1;
+  const aviso = alt ? `Has dicho que naciste a partir del ${mes[3]}: ${NOMBRES[k][0]}. <button class="linkbtn" id="swap" type="button">Si no es así, vuelve a ${otro}</button>.`
+                    : `Con el mes no basta para el signo. Asumo que naciste antes del ${mes[3]} de ${mes[0].toLowerCase()}: ${NOMBRES[k][0]}. <button class="linkbtn" id="swap" type="button">Si naciste del ${mes[3]} en adelante, eres ${otro}</button>.`;
+  const wx = w ? textoTiempo(w, geo.name, grupo) : null;
+  const hits = [...(s.hits||[]), ...(grupo.hits||[])];
+
+  $("#res").innerHTML = `
+    <div class="idcard">
+      <div class="sign">${NOMBRES[k][0]}</div>
+      <div class="meta">Grupo <b>${gk[1].toLowerCase()}</b>, ${edad} años · <b>${esc(lugar)}</b> · puesto ${pos} de 12 en el ranking de hoy · índice de día <b>${Number(s.score).toFixed(1)}</b></div>
+      <div class="meta">${aviso}</div>
+    </div>
+    <div class="cols">
+      <div class="col"><h3>Según los astros <span>lo que dice el horóscopo</span></h3><p class="astros">${esc(s.astros)}</p><p class="astros-src">${ED.horoscopos_reconstruidos ? "Horóscopos no accesibles hoy. Reconstruidos por el robot con el mismo rigor que los originales." : "Resumen de los horóscopos de " + esc(ED.fuentes_horoscopo.join(", ")) + " del " + esc(ED.fecha) + "."}</p></div>
+      <div class="col"><h3>Según las portadas <span>lo que dicen los periódicos</span></h3><p class="contrast">${safe(s.contra)}</p>
+        <div class="verdict"><span class="stamp ${cls}">${lab}</span><div class="meter"><div class="lab"><span>Índice de coincidencia</span><span>${s.coin} %</span></div><div class="bar"><i style="width:${s.coin}%"></i></div></div></div>
+      </div>
+    </div>
+    <div class="gen-block"><div class="col"><h3>Lo que te va a pasar hoy de verdad, ${gk[1].toLowerCase()} <span>portadas × edad × tiempo</span></h3><p class="contrast">${safe(grupo.txt)}</p></div></div>
+    <div class="gen-block"><div class="col"><h3>El tiempo en ${esc(geo.name)} <span>Open-Meteo, lo único verificable de la página</span></h3>
+      ${wx ? `<div class="wx"><div class="temp">${Math.round(w.max)}°<small>máx · mín ${Math.round(w.min)}°</small></div><div><p class="contrast">${esc(wx.t)}</p><p class="data">${CIELO[w.code]||"código "+w.code} · lluvia ${w.lluvia} % · viento ${w.viento} km/h · UV ${w.uv} · luna ${fase(new Date())}</p></div></div>`
+           : `<p class="contrast">Open-Meteo no me responde. Mira por la ventana. Es un método más fiable que los astros y hoy también que yo.</p>`}
+    </div></div>
+    <div class="share"><button type="button" id="copiar">Copiar mi roboscopo</button><span id="copiado"></span></div>`;
+  $("#res").hidden = false;
+  ED.titulares.forEach(t=>{ const el=$("#t"+t.id); if(el) el.classList.toggle("hit", hits.includes(t.id)); });
+  $("#swap").addEventListener("click", ()=>{ alt=!alt; mostrar(false); });
+  $("#copiar").addEventListener("click", async ()=>{
+    const plano = x => String(x).replace(/<\/?mark>/g,"");
+    const txt = `ROBOSCOPO · ${ED.fecha_legible}\n${NOMBRES[k][0]} · ${gk[1]} · ${geo.name}\n\nSegún los astros: ${s.astros}\n\nSegún las portadas: ${plano(s.contra)}\n\n${lab.toUpperCase()} (${s.coin} %)\n\nHoy de verdad: ${plano(grupo.txt)}${wx ? "\n\nEl tiempo: " + wx.t : ""}\n\n${location.href}`;
+    try{ await navigator.clipboard.writeText(txt); $("#copiado").textContent = "Copiado. Compártelo bajo tu responsabilidad."; }catch(e){ $("#copiado").textContent = "Tu navegador no me deja copiar. Selecciónalo a mano, como en 1998."; }
+  });
+  if(scroll) $("#res").scrollIntoView({behavior:"smooth",block:"start"});
+}
+cargar();
+</script>
+</body>
+</html>
