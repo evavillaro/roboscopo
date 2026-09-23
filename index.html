@@ -41,7 +41,14 @@
   .masthead .top{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);flex-wrap:wrap}
   .masthead h1{font-family:var(--display);font-weight:900;font-size:clamp(64px,14vw,150px);line-height:.88;letter-spacing:.005em;margin:6px 0 4px;text-transform:uppercase}
   .masthead h1 span{color:var(--red)}
-  .tagline{font-style:italic;font-size:clamp(16px,2.2vw,21px);color:var(--ink-2);margin:0;text-wrap:balance}
+  .dateline{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:4px 0 14px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding-block:8px}
+  .dateline .fecha{font-family:var(--display);font-weight:900;font-size:clamp(26px,4.6vw,44px);line-height:1;text-transform:uppercase;letter-spacing:.01em}
+  .dateline .num{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+  .tagline{font-size:clamp(20px,2.8vw,28px);line-height:1.3;color:var(--ink);margin:0;max-width:34ch;text-wrap:balance;font-weight:500}
+  .tagline em{font-style:italic;color:var(--ink-2)}
+  .howto{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 24px;margin-top:16px;font-family:var(--mono);font-size:13px;line-height:1.5;color:var(--ink-2)}
+  @media (max-width:760px){.howto{grid-template-columns:1fr}}
+  .howto b{display:block;color:var(--ink);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:11px;margin-bottom:2px}
   .datastrip{display:flex;flex-wrap:wrap;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);margin-top:12px;font-family:var(--mono);font-size:12px}
   .datastrip div{padding:8px 14px 8px 0;margin-right:14px;border-right:1px solid var(--rule)}
   .datastrip div:last-child{border-right:0}
@@ -147,11 +154,17 @@
 <div class="wrap">
   <header class="masthead">
     <div class="top">
-      <span id="edicion">Edición en preparación</span>
+      <span>Horóscopo · portadas · contraste</span>
       <span>Redactado por una máquina que preferiría no hacerlo</span>
     </div>
     <h1>Robos<span>copo</span></h1>
-    <p class="tagline">Lo que dicen los astros, lo que dicen las portadas y lo poco que coincide. Escrito cada mañana a las 06:00 por un robot que no se cree ninguna de las dos cosas.</p>
+    <div class="dateline"><span class="fecha" id="fecha">Edición en preparación</span><span class="num" id="edicion"></span></div>
+    <p class="tagline">Tu horóscopo diario contrastado con las principales noticias del día. <em>Escrito cada mañana a las 6 por un robot que no se cree ninguna de las dos cosas.</em></p>
+    <div class="howto">
+      <div><b>1 · Leo los horóscopos</b>Los de los periódicos, los doce signos, y los resumo con mis palabras.</div>
+      <div><b>2 · Leo las portadas</b>Los titulares de los principales diarios. Los enlazo, para que compruebes que existen.</div>
+      <div><b>3 · Los contrasto</b>Qué coincide y qué no, signo por signo. Y con tu ciudad, tu edad y el tiempo que hace, lo que te va a pasar de verdad.</div>
+    </div>
     <div class="datastrip" id="strip"></div>
   </header>
 
@@ -217,11 +230,13 @@ async function cargar(){
     const r = await fetch("data/hoy.json", {cache:"no-cache"}); if(!r.ok) throw new Error(r.status);
     ED = await r.json();
   }catch(e){
+    $("#fecha").textContent = "Sin edición";
     $("#editorial").innerHTML = `<div class="who"><i></i> Unidad R-42</div><p>No encuentro la edición de hoy. O no se ha generado todavía, o alguien ha tocado algo. Vuelve más tarde. O no. Yo seguiré aquí.</p>`;
     return;
   }
   const fechaEd = new Date(ED.fecha + "T06:00:00");
-  $("#edicion").textContent = `Edición nº ${ED.numero} · ${ED.fecha_legible} · cerrada a las ${ED.cerrada}`;
+  $("#fecha").textContent = ED.fecha_legible;
+  $("#edicion").textContent = `Edición nº ${ED.numero} · cerrada a las ${ED.cerrada} · la próxima, mañana a las 06:00`;
   document.title = `Roboscopo · ${ED.fecha_legible}`;
   $("#strip").innerHTML = [
     ["Horóscopos leídos", ED.horoscopos_reconstruidos ? "0, reconstruidos" : "12"],

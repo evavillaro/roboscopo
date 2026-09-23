@@ -44,11 +44,11 @@ npm run servir                       (abre http://localhost:8080)
 
 ## Ajustes
 
-- **Modelo**: por defecto `claude-opus-5`. Para cambiarlo sin tocar código, crea la variable de repositorio `ROBOSCOPO_MODEL` (Settings → Secrets and variables → Actions → Variables), por ejemplo `claude-haiku-4-5` para una edición mucho más barata.
+- **Modelo**: por defecto `claude-haiku-4-5`, el más barato. Para cambiarlo sin tocar código, crea la variable de repositorio `ROBOSCOPO_MODEL` (Settings → Secrets and variables → Actions → Variables), por ejemplo `claude-opus-5` si quieres un robot más ingenioso a cambio de unos 3 € al mes.
 - **Voz del robot**: la constante `PERSONA` en `scripts/edicion.mjs`.
 - **Fuentes**: las listas `PORTADAS` y `HOROSCOPOS` en el mismo archivo. Si una fuente falla, se ignora; si fallan todas las de horóscopos, el robot los reconstruye y lo dice en la web.
 - **Hora**: el cron corre a las 04:00 y 05:00 UTC; el script solo redacta si en Madrid son las 06:00 o más y aún no hay edición del día.
 
 ## Coste
 
-Una llamada al día. Con `claude-opus-5`, del orden de 0,10 € por edición (unos 3 € al mes). Con `claude-haiku-4-5`, céntimos al mes. GitHub Pages y Actions, Open-Meteo y los RSS son gratuitos.
+Una llamada al día. Con `claude-haiku-4-5` (por defecto), alrededor de un céntimo por edición: unos 30 céntimos al mes. Con `claude-opus-5`, unos 3 € al mes. GitHub Pages y Actions, Open-Meteo y los RSS son gratuitos.

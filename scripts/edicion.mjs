@@ -5,7 +5,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
-const MODEL = process.env.ROBOSCOPO_MODEL || "claude-opus-5";
+// Haiku 4.5 por defecto: una edición cuesta alrededor de un céntimo. Para más ingenio, ROBOSCOPO_MODEL=claude-opus-5.
+const MODEL = process.env.ROBOSCOPO_MODEL || "claude-haiku-4-5";
+const CON_FALLBACK = /opus-5|fable/.test(MODEL); // el parámetro fallbacks solo existe en esos modelos
 const TZ = "Europe/Madrid";
 const FORCE = !!process.env.FORCE && process.env.FORCE !== "false";
 const UA = "Mozilla/5.0 (compatible; Roboscopo/1.0; +https://github.com/evavillaro/roboscopo)";
@@ -172,12 +174,16 @@ Redacta la edición completa de hoy.`;
     output_config: { format: { type: "json_schema", schema } },
   };
   let res;
-  try {
-    // Fallback servidor por defecto: si un clasificador declina la petición, se reintenta en otro modelo dentro de la misma llamada.
-    res = await client.beta.messages.create({ ...peticion, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" });
-  } catch (e) {
-    if (e instanceof Anthropic.BadRequestError) { console.warn("Reintento sin fallbacks:", e.message); res = await client.messages.create(peticion); }
-    else throw e;
+  if (CON_FALLBACK) {
+    try {
+      // Fallback servidor por defecto: si un clasificador declina la petición, se reintenta en otro modelo dentro de la misma llamada.
+      res = await client.beta.messages.create({ ...peticion, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" });
+    } catch (e) {
+      if (e instanceof Anthropic.BadRequestError) { console.warn("Reintento sin fallbacks:", e.message); res = await client.messages.create(peticion); }
+      else throw e;
+    }
+  } else {
+    res = await client.messages.create(peticion);
   }
   if (res.stop_reason === "refusal") throw new Error("El modelo ha declinado redactar la edición: " + JSON.stringify(res.stop_details));
   if (res.stop_reason === "max_tokens") throw new Error("Respuesta truncada por max_tokens");
